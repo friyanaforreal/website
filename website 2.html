@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mystery Surprise Website</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {margin:0; padding:0; box-sizing: border-box;}
+    html {scroll-behavior: smooth;}
+    body {
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      background: linear-gradient(-45deg, #ff6ec4, #7873f5, #42e695, #ff6ec4);
+      background-size: 400% 400%;
+      animation: gradient 12s ease infinite;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+      padding: 1.2rem;
+      position: fixed;
+      width: 100%;
+      background: rgba(0,0,0,0.25);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: transform 0.2s, color 0.3s;
+      font-size: 1.1rem;
+    }
+
+    nav a:hover {transform: scale(1.2); color: #ffeb3b;}
+
+    section {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* Secret text */
+    .secret {
+      cursor: pointer;
+      transition: transform 0.2s;
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+    .secret:hover {
+      color: #ffeb3b;
+      transform: scale(1.2);
+    }
+
+    /* Secret message typing */
+    .mystery {
+      font-size: 1.5rem;
+      margin-top: 1.5rem;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 3px solid #fff;
+      width: 0;
+      animation: typing 2s steps(30, end) forwards, blink 0.7s infinite;
+      display: inline-block;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+    @keyframes blink {
+      50% { border-color: transparent }
+    }
+
+    /* Fireworks Canvas */
+    canvas#fireworks {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* Mobile friendly tweaks */
+    @media (max-width: 768px) {
+      h1 {font-size: 2rem;}
+      p {font-size: 1rem;}
+      nav a {font-size: 1rem;}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="fireworks"></canvas>
+  <nav>
+    <a href="#home" onclick="playClick()">Home</a>
+    <a href="#about" onclick="playClick()">About</a>
+    <a href="#fun" onclick="playClick()">Fun Zone</a>
+    <a href="#contact" onclick="playClick()">Contact</a>
+  </nav>
+
+  <section id="home">
+    <div>
+      <h1>✨ Welcome to the Mystery ✨</h1>
+      <p>Scroll down & explore... there are secrets hidden here. 🔍</p>
+    </div>
+  </section>
+
+  <section id="about">
+    <div>
+      <h1>About Me</h1>
+      <p>I’m a curious soul who loves magic, design, and surprises.</p>
+    </div>
+  </section>
+
+  <section id="fun">
+    <div>
+      <h1 class="secret" onclick="revealMystery()">👀 Click Me For a Surprise</h1>
+      <div id="mysteryBox"></div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div>
+      <h1>Let’s Connect</h1>
+      <p>Email: mystery@example.com</p>
+      <p>Instagram: @mysterylife</p>
+    </div>
+  </section>
+
+  <audio id="clickSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+
+  <script>
+    const messages = [
+      "🌟 You’re more magical than you think!",
+      "💖 Someone out there is smiling because of you.",
+      "🎆 Boom! You just unlocked happiness!",
+      "🌈 You're the secret ingredient to joy!"
+    ];
+
+    function playClick(){
+      const audio = document.getElementById('clickSound');
+      audio.currentTime = 0;
+      audio.play();
+    }
+
+    function revealMystery() {
+      launchFireworks();
+
+      const box = document.getElementById('mysteryBox');
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+      box.innerHTML = `<div class='mystery'>${randomMessage}</div>`;
+    }
+
+    /* Fireworks effect */
+    function launchFireworks(){
+      const canvas = document.getElementById('fireworks');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      for (let i = 0; i < 50; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          speedX: (Math.random() - 0.5) * 6,
+          speedY: (Math.random() - 0.5) * 6,
+          radius: Math.random() * 4 + 2,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+          life: 100
+        });
+      }
+
+      const interval = setInterval(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          p.x += p.speedX;
+          p.y += p.speedY;
+          p.life -= 2;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        });
+      }, 20);
+
+      setTimeout(() => {
+        clearInterval(interval);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }, 1200);
+    }
+  </script>
+</body>
+</html>
