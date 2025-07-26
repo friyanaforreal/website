@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Personal Webpage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    body, html {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-x: hidden;
+      color: white;
+      cursor: url('https://cdn.iconscout.com/icon/free/png-256/magic-wand-1781487-1513646.png') 16 16, auto;
+      background: #000;
+    }
+    canvas#confetti, canvas#snow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    .firefly {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      background: yellow;
+      border-radius: 50%;
+      animation: blink 1s infinite alternate;
+      pointer-events: none;
+      z-index: 999;
+    }
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+    .shimmer {
+      background: linear-gradient(to right, #f6f7f8 8%, #e0e0e0 18%, #f6f7f8 33%);
+      background-size: 800px 104px;
+      animation: shimmer 0.8s infinite linear;
+      height: 20px;
+      width: 100px;
+      border-radius: 4px;
+      margin: 10px auto;
+    }
+    @keyframes shimmer {
+      0% { background-position: -800px 0; }
+      100% { background-position: 800px 0; }
+    }
+    #game {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .cell {
+      width: 60px;
+      height: 60px;
+      background: #fff;
+      color: black;
+      border: 2px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+    }
+    nav a { color: white; margin: 0 10px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+  <canvas id="snow"></canvas>
+  <div class="parallax-bg"></div>
+  <nav>
+    <a onclick="playSound(); showSection('home')">Home</a>
+    <a onclick="playSound(); showSection('about')">About</a>
+    <a onclick="playSound(); showSection('contact')">Contact</a>
+    <a onclick="playSound(); showSection('links')">Links</a>
+  </nav>
+
+  <div class="container wave">
+    <div class="greeting shimmer" id="greeting"></div>
+
+    <div id="home" class="shadow-box section active">
+      <h2 class="disco brush">👋 Welcome Home</h2>
+      <p class="bounce">Email: example@email.com</p>
+      <p class="bounce">Phone: +91-1234567890</p>
+      <div id="game"></div>
+    </div>
+
+    <div id="about" class="shadow-box section">
+      <h2 class="disco brush">About Me</h2>
+      <p class="typewriter">Email: example@email.com</p>
+      <p class="typewriter">Phone: +91-1234567890</p>
+    </div>
+
+    <div id="contact" class="shadow-box section">
+      <h2 class="disco brush">📞 Contact Me</h2>
+      <p class="pulse">Email: example@email.com</p>
+      <p class="pulse">Phone: +91-1234567890</p>
+    </div>
+
+    <div id="links" class="shadow-box section">
+      <h2 class="disco brush">🔗 Useful Links</h2>
+      <p class="spin">Email: example@email.com</p>
+      <p class="spin">Phone: +91-1234567890</p>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 My Personal Webpage
+  </footer>
+
+  <audio id="clickSound" src="https://www.fesliyanstudios.com/play-mp3/387" preload="auto"></audio>
+
+  <script>
+    function showSection(id) {
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(section => {
+        section.classList.remove('active');
+        section.style.display = 'none';
+      });
+      const selected = document.getElementById(id);
+      selected.style.display = 'block';
+      setTimeout(() => {
+        selected.classList.add('active');
+      }, 10);
+      if (Math.random() < 0.2) launchConfetti(); // even less frequent confetti
+    }
+
+    function playSound() {
+      const audio = document.getElementById('clickSound');
+      audio.currentTime = 0;
+      audio.play();
+    }
+
+    function setGreeting() {
+      const hour = new Date().getHours();
+      let message = "";
+      if (hour < 12) message = "Good Morning!";
+      else if (hour < 18) message = "Good Afternoon!";
+      else message = "Good Evening!";
+      const utterance = new SpeechSynthesisUtterance(message);
+      speechSynthesis.speak(utterance);
+      document.getElementById('greeting').textContent = message;
+    }
+
+    function launchConfetti() {
+      const canvas = document.getElementById('confetti');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let particles = [];
+      for (let i = 0; i < 20; i++) { // even fewer particles
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 6 + 2,
+          d: Math.random() * 100,
+          color: `hsl(${Math.random() * 360}, 100%, 50%)`
+        });
+      }
+      let angle = 0;
+      let drawCount = 0;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(p => {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        });
+        update();
+        drawCount++;
+        if (drawCount > 80) clearInterval(interval); // stop quickly
+      }
+      function update() {
+        angle += 0.02;
+        particles.forEach(p => {
+          p.y += Math.cos(angle + p.d) + 2 + p.r / 2;
+          p.x += Math.sin(angle) * 2;
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+      }
+      let interval = setInterval(draw, 15);
+    }
+
+    function createFirefly() {
+      if (Math.random() < 0.1) { // even less frequent fireflies
+        const fly = document.createElement('div');
+        fly.className = 'firefly';
+        fly.style.left = Math.random() * 100 + 'vw';
+        fly.style.top = Math.random() * 100 + 'vh';
+        document.body.appendChild(fly);
+        setTimeout(() => document.body.removeChild(fly), 2000); // disappear quicker
+      }
+    }
+    setInterval(createFirefly, 800);
+
+    function setupGame() {
+      const game = document.getElementById('game');
+      const board = Array(9).fill(null);
+      let currentPlayer = 'X';
+      for (let i = 0; i < 9; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.addEventListener('click', () => {
+          if (!board[i]) {
+            board[i] = currentPlayer;
+            cell.textContent = currentPlayer;
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+          }
+        });
+        game.appendChild(cell);
+      }
+    }
+
+    function startSnowfall() {
+      const canvas = document.getElementById('snow');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const snowflakes = [];
+      for (let i = 0; i < 40; i++) { // fewer snowflakes
+        snowflakes.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: Math.random() * 4 + 1,
+          d: Math.random() * 2 + 2
+        });
+      }
+      let frame = 0;
+      function drawSnowflakes() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        snowflakes.forEach(f => {
+          ctx.moveTo(f.x, f.y);
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+        });
+        ctx.fill();
+        updateSnowflakes();
+        frame++;
+        if (frame > 150) clearInterval(snowInterval); // stop snowfall quicker
+      }
+      function updateSnowflakes() {
+        snowflakes.forEach(f => {
+          f.y += f.d;
+          if (f.y > canvas.height) {
+            f.y = 0;
+            f.x = Math.random() * canvas.width;
+          }
+        });
+      }
+      let snowInterval = setInterval(drawSnowflakes, 20);
+    }
+
+    setupGame();
+    setGreeting();
+    startSnowfall();
+  </script>
+</body>
+</html>
